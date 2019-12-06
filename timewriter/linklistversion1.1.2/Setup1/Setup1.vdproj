@@ -21,6 +21,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_269AC3E13E81158C166790AEAE5F68E7"
+        "OwnerKey" = "8:_ED77C2A680EB446F929C94790A89A493"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3E6F9DE80C4B531FA790860A5D7D4977"
+        "OwnerKey" = "8:_ED77C2A680EB446F929C94790A89A493"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_792327D38DF8465D838F82AFB9766E94"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -53,6 +65,12 @@
         {
         "MsmKey" = "8:_ED77C2A680EB446F929C94790A89A493"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ED8F18FC15A150191F7332E07E5E9BED"
+        "OwnerKey" = "8:_ED77C2A680EB446F929C94790A89A493"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -162,6 +180,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_269AC3E13E81158C166790AEAE5F68E7"
+            {
+            "SourcePath" = "8:MSVCP140D.dll"
+            "TargetName" = "8:MSVCP140D.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_D61699C1420449DD94D57B2224858CC1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3E6F9DE80C4B531FA790860A5D7D4977"
+            {
+            "SourcePath" = "8:ucrtbased.dll"
+            "TargetName" = "8:ucrtbased.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_D61699C1420449DD94D57B2224858CC1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_792327D38DF8465D838F82AFB9766E94"
             {
             "SourcePath" = "8:E:\\图标素材\\book_48px_1227947_easyicon.net.ico"
@@ -262,6 +320,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ED8F18FC15A150191F7332E07E5E9BED"
+            {
+            "SourcePath" = "8:VCRUNTIME140D.dll"
+            "TargetName" = "8:VCRUNTIME140D.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_D61699C1420449DD94D57B2224858CC1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -351,15 +429,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Timewriter"
-        "ProductCode" = "8:{841413A6-8E9B-45C7-90C2-7D1D26E5F8B7}"
-        "PackageCode" = "8:{9B02373B-52C2-4DD5-BF23-AE5223ACF3F8}"
+        "ProductCode" = "8:{2659DE0A-025B-4883-8B76-00CE0821FB3E}"
+        "PackageCode" = "8:{1D777CC5-92CC-4430-AEE2-8F46915F0890}"
         "UpgradeCode" = "8:{11B01BBE-EBA4-4D6A-85FC-5D8190125ABD}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.2"
+        "ProductVersion" = "8:1.2.0"
         "Manufacturer" = "8:komiya"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com//zhengyunhai//timewriter.git"

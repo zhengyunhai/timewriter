@@ -34,6 +34,7 @@ void showinfo(struct wlp* node);
 void freei(struct data* node);
 void f0(char* ti);
 void outlist();//補竃峺綜双燕
+void delnode(struct wlp** node,char* date);
 
 void f0(char* ti)//野割0
 {
@@ -400,7 +401,7 @@ void searchdata(struct wlp* wl,char* date)
 			}
 			temp = temp->next;
 		}
-		if (count == 0) cout << "There's no data for " << date << endl;
+		if (count == 0) cout << "There's no data for '" << date <<"'"<< endl;
 	}
 }
 
@@ -431,36 +432,84 @@ void freed(struct wlp* wl)
 
 void outlist()
 {
-	cout<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "|             * Command list *             |" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "|     sh       -show command list          |" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "|  log        -to start writing a log      |" << endl
-		<< "  " << "|  endw       -to finish writing the log   |" << endl
-		<< "  " << "|   cl        -check today's log           |" << endl
-		<< "  " << "| cl date     -check log in date           |" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "|  plan       -to start writing a plan     |" << endl
-		<< "  " << "| plan date   -to start writing a plan     |" << endl
-		<< "  " << "|  endw       -to finish writing the plan  |" << endl
-		<< "  " << "|   cp        -check today's plan          |" << endl
-		<< "  " << "| cp date     -check plan in date          |" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
+	cout << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|                  * Command list *                  |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|       shc              -show command list          |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|       list             -show command list          |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|       log             -to start writing a log      |" << endl
+		<< "  " << "|       endw            -to finish writing the log   |" << endl
+		//<< "  " << "|   cl        -check today's log           |" << endl
+		<< "  " << "|      cl [date]        -check log in date           |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		//<< "  " << "|  plan       -to start writing a plan     |" << endl
+		<< "  " << "|     plan [date]       -to start writing a plan     |" << endl
+		<< "  " << "|       endw            -to finish writing the plan  |" << endl
+		//<< "  " << "|        cp        -check today's plan          |" << endl
+		<< "  " << "|     cp [date]         -check plan in date          |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|   del log [date]      -check plan in date          |" << endl
+		<< "  " << "|   del plan [date]     -check plan in date          |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
 		//<<" exit     -to stop this program"<<endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "*    DO NOT use 'exit' before you really   *" << endl
-		<< "  " << "*       want to FINISH this program.       *" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！" << endl;
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "*         DO NOT use 'exit' before you really        *" << endl
+		<< "  " << "*             want to FINISH this program.           *" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+}
+
+void delnode(struct wlp** node, char* date)
+{
+	struct wlp* temp;
+	struct wlp* head;
+	int i = 0;
+	head = *node;
+	temp = NULL;
+	//temp = (struct wlp*)malloc(sizeof(struct wlp));
+
+	if (*node == NULL) {
+		cout << "No data for '" << date <<"'"<< endl;
+	}
+	else
+	{		
+		temp = head->next;
+		if (temp == NULL) {//及匯倖准泣葎腎
+			cout << "No data for '" << date <<"'"<< endl;
+		}
+		else
+		{
+			while (temp != NULL)
+			{
+				if (strcmp(temp->today, date))
+				{
+					head = temp;
+					temp = head->next;
+				}
+				else
+				{
+					head->next = temp->next;
+					//temp->next = NULL;
+					freei(temp->lpdata.next);
+					free(temp);
+					i = 1;
+					goto shuchu;
+				}
+			}
+			
+		}	
+	}
+shuchu:	if (i == 1)cout <<"Data '"<< date << "' has been deleted!" << endl;
+	else cout << "No such data '" << date <<"'"<< endl;
 }
 
 int main(void)
 {
 	ofstream outf;
 	ifstream inf;
-	char command[5];
-	char command1[11] = {0};
-	char temp2[11];
+	
+	//char temp2[11];
 	char* td = getday();
 	char* tt = gettime();
 	cout << td<<" "<<tt << endl;
@@ -468,13 +517,13 @@ int main(void)
 	char path2[] = ".\\data\\plan";
 	//command list
 	{
-		cout<< "！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "|                   TimeWriter                     |" << endl
-			<< "！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "|                  Version1.1.2                    |" << endl
-			<< "！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "| https://github.com//zhengyunhai/timewriter.git   |" << endl
-			<< "！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+		cout << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+			<< "  " << "|                     Time Writer                     |" << endl
+			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+			<< "  " << "|                    Version 1.2.0                    |" << endl
+			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+			<< "  " << "|   https://github.com//zhengyunhai/timewriter.git   |" << endl
+			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
 	clist:outlist();
 	}
 	struct wlp* wl = NULL;
@@ -488,14 +537,18 @@ int main(void)
 	if(loadfile(path1,&wl)==2)cout<<"嬉蝕晩崗猟周払移��"<<endl;
 	//墮秘柴皿猟周
 	if (loadfile(path2, &wp) == 2)cout << "嬉蝕柴皿猟周払移��" << endl;
-	
+
+	char command[5] = { 0 };
 shuru:cout << "TimeWriter>> ";
 	  cin >> command;
 	  //嶷亟忖憲堪謄塘
+	  char command1[11] = { 0 };
+	  char command2[11] = { 0 };
+	  char command3[2] = { 0 };
 	  char tc[1] = {0};
 	  tc[0] = getchar();
 	  {
-		  if (!strcmp(command, "sh"))
+		  if (!strcmp(command, "shc"))//show command list
 		  {
 			  if (tc[0] =='\n') goto clist;
 			  else 
@@ -508,7 +561,76 @@ shuru:cout << "TimeWriter>> ";
 				  goto  shuru;
 			  }
 		  }
-		  if (!strcmp(command, "log"))
+
+		  if (!strcmp(command, "list"))//双竃�酊臣�
+		  {
+			  struct wlp* temp=NULL;
+			  if (tc[0] == '\n')
+			  {
+				  cout << "Need more arguments!" << endl;
+				  goto shuru;
+			  }
+			  else
+			  {
+				  cin >> command1;
+				  //char tc[1] = { 0 };
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  while (tc[0] != '\n')//郭渠謹噫議歌方
+					  {
+						  tc[0] = getchar();
+					  }
+					  cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  if (!strcmp(command1, "log"))
+					  {
+						  if (wl == NULL)cout << "No logs!" << endl;
+						  temp = wl;
+						  temp = temp->next;
+						  if (temp == NULL)
+						  {
+							  cout << "No logs!" << endl;
+						  }
+						  else
+						  {
+							  while (temp != NULL)
+							  {
+								  cout << " "<<temp->today << endl;
+								  temp = temp->next;
+							  }
+						  }						  
+					  }
+					  else if (!strcmp(command1, "plan"))
+						  {
+							if (wp == NULL)cout << "No plans!" << endl;
+							  temp = wp;
+							  temp = temp->next;
+							  if (temp == NULL)
+							  {
+								  cout << "No plans!" << endl;
+							  }
+							  else
+							  {
+								  while (temp != NULL)
+								  {
+									  cout <<" "<< temp->today << endl;
+									  temp = temp->next;
+								  }
+							  }					  
+						  }
+					  else {
+						  cout << "Wrong argument!" << endl;
+					  }
+					  goto shuru;	  
+				  }
+			  }
+		  }
+
+		  if (!strcmp(command, "log"))//亟晩崗
 		  {
 			  if (tc[0] == '\n')
 			  {
@@ -525,23 +647,39 @@ shuru:cout << "TimeWriter>> ";
 				  goto shuru;
 			  }
 		  }
-		  if (!strcmp(command, "plan"))
+
+		  if (!strcmp(command, "plan"))//亟柴皿
 		  {
-			  if (tc[0] == '\n')
+			  if (tc[0] == '\n')//plan
 			  {
-				  cout << "Please input Date>>";
-				  cin >> temp2;
-				  adddata(&wp, temp2);
+				  //cout << "Please input Date>>";
+				  //cin >> temp2;
+				  adddata(&wp, td);
 				  goto shuru;
 			  }
-			  else
+			  else//plan [date]
 			  {
 				  cin >> command1;
-				  adddata(&wp, command1);
-				  goto shuru;
+				  //char tcc[1] = { 0 };
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  while (tc[0] != '\n')//郭渠謹噫議歌方
+					  {
+						  tc[0] = getchar();
+					  }
+					  cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  adddata(&wp, command1);
+					  goto shuru;
+				  }		  
 			  }	  
 		  }
-		  if (!strcmp(command, "cl"))
+
+		  if (!strcmp(command, "cl"))//check logs in date
 		  {
 			  if (tc[0] == '\n')
 			  {
@@ -551,11 +689,26 @@ shuru:cout << "TimeWriter>> ";
 			  else
 			  {
 				  cin >> command1;
-				  searchdata(wl, command1);
-				  goto shuru;
+				  //char tc[1] = { 0 };
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  while (tc[0] != '\n')//郭渠謹噫議歌方
+					  {
+						  tc[0] = getchar();
+					  }
+					  cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  searchdata(wl, command1);
+					  goto shuru;
+				  }
 			  }
 		  }
-		  if (!strcmp(command, "cp"))
+
+		  if (!strcmp(command, "cp"))//check plan in date
 		  {
 			  if (tc[0] == '\n')
 			  {
@@ -565,11 +718,77 @@ shuru:cout << "TimeWriter>> ";
 			  else
 			  {
 				  cin>>command1;
-				  searchdata(wp, command1);
-				  goto shuru;
+				  //char tcc[1] = { 0 };
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  while (tc[0] != '\n')//郭渠謹噫議歌方
+					  {
+						  tc[0] = getchar();
+					  }
+					  cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  searchdata(wp, command1);
+					  goto shuru;
+				  }
 			  }
 		  }
-		  if (!strcmp(command, "exit")) 
+
+		  if (!strcmp(command, "del"))//評茅孔嬬
+		  {
+			  if (tc[0] == '\n')
+			  {
+				  cout << "No argument!" << endl;
+				  goto shuru;
+			  }
+			  else
+			  {
+				  cin >> command1;
+				  //char tcc[1] = { 0 };
+				  tc[0] = getchar();
+				  if (tc[0] == '\n')
+				  {
+					  cout << "Need more arguments!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  cin>>command2;
+					  tc[0] = getchar();
+					  if (tc[0] != '\n')
+					  {
+						  cout << "Too many argument!" << endl;
+						  goto shuru;
+					  }
+					  else
+					  {
+						  cout << command1 << " in " << command2 << " will be deleted.Countinue?(Y/N):";
+						  cin>>command3;
+						  if (!strcmp(command3, "y") || !strcmp(command3, "Y"))
+						  {
+							  if (!strcmp(command1, "log"))
+							  {
+								  delnode(&wl, command2);
+							  }
+							  else if (!strcmp(command1, "plan"))
+							  {
+								  delnode(&wp, command2);
+							  }
+							  else cout << "Wrong argument!" << endl;
+							  goto shuru;
+						  }
+						  else goto shuru;
+						  
+					  }
+					  
+				  }
+			  }
+		  }	
+
+		  if (!strcmp(command, "exit")) //曜竃殻會
 		  {
 			  if (tc[0] == '\n')
 			  {
@@ -596,8 +815,8 @@ shuru:cout << "TimeWriter>> ";
 		  }
 		  else {
 			  cout << "Can't find command '" << command <<" "<<command1<< "' in command list." << endl;
-			  char command = { 0 };
-			  char command1 = { 0 };
+			 // char command = { 0 };
+			 // char command1 = { 0 };
 			  goto shuru;
 		  }
 	  }

@@ -42,6 +42,7 @@ void outlist();//補竃峺綜双燕
 void delnode(struct wlp** node,char* date);//評茅准泣
 void sampleinfo(struct wlp* node);//酒待佚連
 void exportlog(struct wlp* node,char* name);//擬竃node全燕嶄兆葎name議准泣欺揖兆txt嶄
+void headlist();
 
 void f0(char* ti)//野割0
 {
@@ -403,8 +404,11 @@ void freed(struct wlp* wl)
 
 void outlist()
 {
+	cout << "  " << "                                         " << getday() << " " << gettime() << endl;
 	cout << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
 		<< "  " << "|                    * Command list *                    |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		
 		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
 		<< "  " << "|     shc                     -show command list         |" << endl
 		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
@@ -421,11 +425,13 @@ void outlist()
 		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
 		<< "  " << "|     del [log/plan] [name]   -delete data               |" << endl
 		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "|     expd [name]             -export log data               |" << endl
-		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-		<< "  " << "*           DO NOT use 'exit' before you really          *" << endl
+		<< "  " << "|     expd [name]             -export log data           |" << endl
+		<< "  " << "|     exit                    -save and exit             |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+	/*	<< "  " << "*           DO NOT use 'exit' before you really          *" << endl
 		<< "  " << "*               want to FINISH this program.             *" << endl
 		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+	*/
 }
 
 void delnode(struct wlp** node, char* name)//廣吭宸氏評茅嚥name揖兆議侭嗤准泣
@@ -468,7 +474,8 @@ void delnode(struct wlp** node, char* name)//廣吭宸氏評茅嚥name揖兆議侭嗤准泣
 			
 		}	
 	}
-shuchu:	if (i == 1)cout <<i<<" Data node '"<< name << "' has been deleted!" << endl;
+//shuchu:
+	if (i == 1)cout <<i<<" Data node '"<< name << "' has been deleted!" << endl;
 		else if (i > 1)cout << i << " Data nodes '" << name << "' have been deleted!" << endl;
 			 else cout << "No such data '" << name <<"'"<< endl;
 }
@@ -525,6 +532,17 @@ void exportlog(struct wlp* node,char* name)
 	cout << "Data '" << name << "' has been exported in TXT.'" << endl;
 }
 
+void headlist()
+{
+	cout << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|                     Time Writer                    |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|                    Version 1.3.1                   |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
+		<< "  " << "|   https://github.com//zhengyunhai/timewriter.git   |" << endl
+		<< "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+}
+
 int main(void)
 {
 	ofstream outf;
@@ -536,13 +554,7 @@ int main(void)
 	char path2[] = ".\\data\\plan";
 	//command list
 	{
-		cout << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "  " << "|                     Time Writer                    |" << endl
-			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "  " << "|                    Version 1.3.0                   |" << endl
-			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl
-			<< "  " << "|   https://github.com//zhengyunhai/timewriter.git   |" << endl
-			 << "  " << "！！！！！！！！！！！！！！！！！！！！！！！！！！！" << endl;
+		headlist();
 	clist:outlist();
 	}
 	struct wlp* wl = NULL;
@@ -632,7 +644,7 @@ shuru:cout << "TimeWriter>> ";
 					  }
 					  if (!strcmp(command1, "prog"))//双竃蝕窟晩崗朕村
 					  {
-						  if (wp == NULL)cout << "No prog!" << endl;
+						  if (wl == NULL)cout << "No prog!" << endl;
 						  else {
 							  temp = wl;//prog嚥log贋壓揖匯全燕嶄
 							  temp = temp->next;

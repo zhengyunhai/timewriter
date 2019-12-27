@@ -36,7 +36,7 @@ char* getday();//获取当前日期
 char* gettime();//获取当前时间
 void initnode(struct wlp** head, int i);//节点初始化
 int addinfo(struct wlp* node);
-void adddata(struct wlp** library, char* date,int b);
+void adddata(struct wlp** library, char* name,char* date,int b);
 void searchdata(struct wlp* wl, char* date);
 void freed(struct wlp* wl);
 void showinfo(struct wlp* node);
@@ -241,7 +241,7 @@ void outtofile(char*path,struct wlp* wl)
 	}
 }
 
-void adddata(struct wlp** library, char* name,int b)//new version//可以继续优化
+void adddata(struct wlp** library, char* name,char* date,int b)//new version//可以继续优化
 											  //原理过程说明：查看第一个节点是否为目标节点，是则在其上添加数据，否则新建节点并插入，即只检测第一个节点，并非遍历整个链表
 {
 	char* td=getday() ;
@@ -314,7 +314,7 @@ void adddata(struct wlp** library, char* name,int b)//new version//可以继续优化
 					book->next = temp;
 				}	
 			}
-			else if (!strcmp(end->name, name))//目标节点已存在,即第一个节点为目标节点
+			else if (!strcmp(end->name, name)&&!strcmp(end->today,date))//目标节点已存在,即第一个节点为目标节点，日志本身是以日期为名，故可以用name判断，但开发日志以项目为名，同时以日期进行判断
 			{
 				addinfo(end);
 			}
@@ -777,7 +777,7 @@ shuru:cout << endl<<"TimeWriter>> ";
 		  {
 			  if (tc[0] == '\n')
 			  {
-				  adddata(&wl, td,0);//logend包含在其中
+				  adddata(&wl, td,td,0);//logend包含在其中
 				  goto shuru;
 			  }
 			  else 
@@ -813,7 +813,7 @@ shuru:cout << endl<<"TimeWriter>> ";
 				  }
 				  else
 				  {
-					  adddata(&wl, command1,1);
+					  adddata(&wl, command1,td,1);
 					  goto shuru;
 				  }
 			  }
@@ -823,7 +823,7 @@ shuru:cout << endl<<"TimeWriter>> ";
 		  {
 			  if (tc[0] == '\n')//plan
 			  {
-				  adddata(&wp, td,0);
+				  adddata(&wp, td,td,0);
 				  goto shuru;
 			  }
 			  else//plan [date]
@@ -841,7 +841,7 @@ shuru:cout << endl<<"TimeWriter>> ";
 				  }
 				  else
 				  {
-					  adddata(&wp, command1,0);
+					  adddata(&wp, command1,td,0);
 					  goto shuru;
 				  }		  
 			  }	  

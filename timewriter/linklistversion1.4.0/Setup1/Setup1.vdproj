@@ -352,7 +352,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Timewriter"
         "ProductCode" = "8:{163BC2CD-E4D7-4A0A-9768-BADF7278A667}"
-        "PackageCode" = "8:{8A3248C7-1F65-450C-9536-B3535597BC0B}"
+        "PackageCode" = "8:{64E81F52-F546-4CC6-B098-4B49016117A8}"
         "UpgradeCode" = "8:{11B01BBE-EBA4-4D6A-85FC-5D8190125ABD}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"

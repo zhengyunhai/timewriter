@@ -7,6 +7,7 @@
 #include<ctime>
 #include<direct.h>
 #include<windows.h>
+const char *ver = "1.4.0";
 using namespace std;
 
 typedef struct data
@@ -26,13 +27,16 @@ typedef struct wlp
 	wlp* next;
 }wlp;
 
-
+typedef struct namelink {
+	char name[20];
+	namelink* next;
+}namelink;
 
 char* getday();//获取当前日期
 char* gettime();//获取当前时间
 void initnode(struct wlp** head, int i);//节点初始化
 int addinfo(struct wlp* node);
-void adddata(struct wlp** library, char* date);
+void adddata(struct wlp** library, char* date,int b);
 void searchdata(struct wlp* wl, char* date);
 void freed(struct wlp* wl);
 void showinfo(struct wlp* node);
@@ -43,6 +47,10 @@ void delnode(struct wlp** node,char* date);//删除节点
 void sampleinfo(struct wlp* node);//简略信息
 void exportlog(struct wlp* node,char* name);//导出node链表中名为name的节点到同名txt中
 void headlist();
+int is_node(struct wlp* node, char* name);//返回链表中与name匹配的节点个数
+void delall(struct wlp* node);//删除全部节点
+void menu(struct wlp** namelink, struct wlp* node);//将node链表中节点按顺序保存首次出现的节点名到namelink中
+void copynode();
 
 void f0(char* ti)//填充0
 {
@@ -58,12 +66,12 @@ int addinfo(struct wlp* node)
 	struct data *endn;
 	char temp2[100] = { 0 };
 	endn = &(node->lpdata);
-sr:	cout << "AddInfo>>";
+sr:	cout <<endl<< "AddInfo>>";
 	cin >> temp2;
 	while(strcmp(temp2, "endw")) 
 	{
 		temp = (struct data*)malloc(sizeof(struct data));
-		if (temp == NULL) { cout << "内存分配失败" << endl; exit(1); }
+		if (temp == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 		tt = gettime();
 		strcpy_s(temp->time, 13, tt);
 		temp->next = NULL;
@@ -87,7 +95,7 @@ char* getday()//获取当前日期
 	char temp3[8] = {0};
 	char* r;
 	r = (char*)malloc(sizeof(temp1));
-	if (r == NULL) { cout << "内存分配失败" << endl; exit(1); }
+	if (r == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 	time_t sec = time(0);
 	struct tm now;
 	localtime_s(&now, &sec);
@@ -110,7 +118,7 @@ char* gettime()//获取当前时间
 	char temp4[13] = "[";
 	char* r;
 	r = (char*)malloc(sizeof(temp1));
-	if (r == NULL) { cout << "内存分配失败" << endl; exit(1); }
+	if (r == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 	time_t sec = time(0);
 	struct tm now;
 	localtime_s(&now, &sec);
@@ -160,7 +168,7 @@ int loadfile(char* path,struct wlp **wl)//假定文件存在
 	struct wlp* lend,*head;
 	lend = NULL;
 	head = (struct wlp*)malloc(sizeof(struct wlp));
-	if (head == NULL) { cout << "内存分配失败" << endl; exit(1); }
+	if (head == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 	initnode(&head,0);
 	*wl = head;
 	lend = head;
@@ -176,7 +184,7 @@ int loadfile(char* path,struct wlp **wl)//假定文件存在
 			tempend1 = NULL;
 			nn = NULL;
 			temp2 = (struct wlp*)malloc(sizeof(struct wlp));
-			if (temp2 == NULL) { cout << "内存分配失败" << endl; exit(1); }
+			if (temp2 == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 			strcpy_s(temp2->name,strlen(temp1)+1 , temp1);
 			inf >> temp2->today;
 			inf >> temp2->b;
@@ -191,7 +199,7 @@ int loadfile(char* path,struct wlp **wl)//假定文件存在
 			while (i <= temp2->count)
 			{
 				nn = (struct data*)malloc(sizeof(struct data));
-				if (nn == NULL) { cout << "内存分配失败" << endl; exit(1); }
+				if (nn == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 				inf >> nn->time;
 				inf >> nn->info;
 				nn->next = NULL;
@@ -205,17 +213,17 @@ int loadfile(char* path,struct wlp **wl)//假定文件存在
 	return 0;
 }
 
-void outputfile(char*path,struct wlp* wl)
+void outtofile(char*path,struct wlp* wl)
 {
 	ofstream outf;
 	struct wlp* wtemp = wl;
 	struct wlp* lend;
 	struct data* temp = NULL;
 	lend = wtemp->next;//第一个节点
-	if (wtemp == NULL) { cout << "没有可保存信息" << endl; }
+	if (wtemp == NULL) { cout << "No data to save!" << endl; }
 	else 
 	{
-		cout << "正在保存..." << endl;
+		cout << "Saving..." << endl;
 		outf.open(path);
 		while (lend != NULL)
 		{
@@ -229,11 +237,11 @@ void outputfile(char*path,struct wlp* wl)
 			lend = lend->next;
 		}
 		outf.close();
-		cout << "保存完成！" << endl;
+		cout << "Save finished！" << endl;
 	}
 }
 
-void adddata(struct wlp** library, char* name,int b)//new version
+void adddata(struct wlp** library, char* name,int b)//new version//可以继续优化
 											  //原理过程说明：查看第一个节点是否为目标节点，是则在其上添加数据，否则新建节点并插入，即只检测第一个节点，并非遍历整个链表
 {
 	char* td=getday() ;
@@ -250,14 +258,14 @@ void adddata(struct wlp** library, char* name,int b)//new version
 			book = (struct wlp*)malloc(sizeof(struct wlp));//分配空间 ，注意类型转换 
 			if (book == NULL)//分配失败 
 			{
-				printf("内存分配失败\n");
+				printf("Memory allocation failed.\n");
 				exit(1);
 			}
 			strcpy_s(book->name, 20, name);
 			strcpy_s(book->today, 13, td);
 			book->b = b;
 			book->count = 1;
-			cout << "AddInfo>>" ;
+			cout << endl<<"AddInfo>>" ;
 			cin >> book->lpdata.info;
 			if (!strcmp(book->lpdata.info, "endw"))
 			{
@@ -271,7 +279,7 @@ void adddata(struct wlp** library, char* name,int b)//new version
 				book->next = NULL;
 				addinfo(book);
 				head1 = (struct wlp*)malloc(sizeof(struct wlp));
-				if (head1 == NULL) { cout << "内存分配失败" << endl; exit(1); }
+				if (head1 == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
 				initnode(&head1, 0);
 				*library = head1;//头节点
 				head1->next = book;//注意book是指针，这里是传递地址 
@@ -283,12 +291,12 @@ void adddata(struct wlp** library, char* name,int b)//new version
 			if (end == NULL)//第一个节点为空，只有一个头节点
 			{
 				book = (struct wlp*)malloc(sizeof(struct wlp));//分配空间 ，注意类型转换 
-				if (book == NULL) {printf("内存分配失败\n");exit(1);}
+				if (book == NULL) {printf("Memory allocation failed.\n");exit(1);}
 				strcpy_s(book->name, 20, name);
 				strcpy_s(book->today, 13, td);
 				book->b = b;
 				book->count = 1;
-				cout << "AddInfo>>";
+				cout << endl<<"AddInfo>>";
 				cin >> book->lpdata.info;
 				if (!strcmp(book->lpdata.info, "endw"))
 				{
@@ -315,14 +323,14 @@ void adddata(struct wlp** library, char* name,int b)//new version
 				book = (struct wlp*)malloc(sizeof(struct wlp));//分配空间 ，注意类型转换 
 				if (book == NULL)//分配失败 
 				{
-					printf("内存分配失败\n");
+					printf("Memory allocation failed.\n");
 					exit(1);
 				}
 				strcpy_s(book->name, 20, name);
 				strcpy_s(book->today, 13, td);
 				book->b = b;
 				book->count = 1;
-				cout << "AddInfo>>";
+				cout << endl<<"AddInfo>>";
 				cin >> book->lpdata.info;
 				if (!strcmp(book->lpdata.info, "endw"))
 				{
@@ -364,6 +372,7 @@ void searchdata(struct wlp* wl,char* name)
 	if (temp == NULL) cout << "Empty Data." << endl;
 	else
 	{
+		cout << endl;
 		while (temp!= NULL)
 		{
 			if (!strcmp(temp->name, name))
@@ -400,38 +409,6 @@ void freed(struct wlp* wl)
 		freei(temp2);	
 		free(temp);
 	}
-}
-
-void outlist()
-{
-	cout << "  " << "                                         " << getday() << " " << gettime() << endl;
-	cout << "  " << "—————————————————————————————" << endl
-		<< "  " << "|                    * Command list *                    |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     shc                     -show command list         |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     list [log/prog/plan]    -show logmenu              |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     log                     -to start writing a log    |" << endl
-		<< "  " << "|     prog [progname]         -to start writing a proglog|" << endl
-		<< "  " << "|     endw                    -to finish writing the log |" << endl
-		<< "  " << "|     cl [name]               -check log/prog            |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     plan [name]             -to start writing a plan   |" << endl
-		<< "  " << "|     endw                    -to finish writing the plan|" << endl
-		<< "  " << "|     cp [date/name]          -check plan in date        |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     del [log/plan] [name]   -delete data               |" << endl
-		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     expd [name]             -export log data           |" << endl
-		<< "  " << "|     exit                    -save and exit             |" << endl
-		<< "  " << "—————————————————————————————" << endl;
-	/*	<< "  " << "*           DO NOT use 'exit' before you really          *" << endl
-		<< "  " << "*               want to FINISH this program.             *" << endl
-		<< "  " << "—————————————————————————————" << endl;
-	*/
 }
 
 void delnode(struct wlp** node, char* name)//注意这会删除与name同名的所有节点
@@ -480,6 +457,14 @@ void delnode(struct wlp** node, char* name)//注意这会删除与name同名的所有节点
 			 else cout << "No such data '" << name <<"'"<< endl;
 }
 
+void delall(struct wlp* node)
+{
+	struct wlp* temp;
+	temp = node->next;
+	node->next = NULL;
+	freed(temp);
+}
+
 void sampleinfo(struct wlp* node)
 {
 	if (node->count != 0)
@@ -497,11 +482,27 @@ void sampleinfo(struct wlp* node)
 		{
 			temp[i] = node->lpdata.info[i];
 		}
-		if(N==12)strcat_s(temp, sizeof(temp), " ... ...");
+		if(node->count>1||N==12)strcat_s(temp, sizeof(temp), " ... ...");
 		
 		cout << temp;
 	}
 	cout << endl;
+}
+
+int is_node(struct wlp* node,char* name)
+{
+	struct wlp* temp;
+	temp = node;
+	int i = 0;
+	while (temp != NULL)
+	{
+		if (!strcmp(temp->name, name))
+		{
+			i++;
+		}
+		temp = temp->next;
+	}
+	return i;
 }
 
 void exportlog(struct wlp* node,char* name)
@@ -510,26 +511,68 @@ void exportlog(struct wlp* node,char* name)
 	strcat_s(path, 50, name);
 	strcat_s(path, 50, ".txt");
 	ofstream outf;
-	outf.open(path, ios::app);
-	struct wlp* temp;
-	struct data* end;
-	temp = node->next;
-	while (temp != NULL)
+	if(!is_node(node,name))
 	{
-		if (!strcmp(temp->name, name))
-		{
-			outf << temp->today << endl;
-			end = &(temp->lpdata);
-			while (end != NULL)
-			{
-				outf << end->time << " " << end->info << endl;
-				end = end->next;
-			}
-		}
-		temp = temp->next;
+		cout << "No data can be exported." << endl;
 	}
-	outf.close();
-	cout << "Data '" << name << "' has been exported in TXT.'" << endl;
+	else
+	{
+		outf.open(path, ios::app);
+		struct wlp* temp;
+		struct data* end;
+		temp = node->next;
+		while (temp != NULL)
+		{
+			if (!strcmp(temp->name, name))
+			{
+				outf << temp->today << endl;
+				end = &(temp->lpdata);
+				while (end != NULL)
+				{
+					outf << end->time << " " << end->info << endl;
+					end = end->next;
+				}
+			}
+			temp = temp->next;
+		}
+		outf.close();
+		cout << "Data '" << name << "' has been exported in TXT.'" << endl;
+	}
+}
+
+void outlist()
+{
+	cout << "  " << "                                         " << getday() << " " << gettime() << endl;
+	cout << "  " << "—————————————————————————————" << endl
+		<< "  " << "|                    * Command list *                    |" << endl
+		<< "  " << "—————————————————————————————" << endl
+
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     -help                     -show command list       |" << endl
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     list [log/prog/plan]    -show logmenu              |" << endl
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     log                     -to start writing a log    |" << endl
+		<< "  " << "|     prog [progname]         -to start writing a proglog|" << endl
+		<< "  " << "|     endw                    -to finish writing the log |" << endl
+		<< "  " << "|     cl [name]               -check log/prog            |" << endl
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     plan [name]             -to start writing a plan   |" << endl
+		<< "  " << "|     endw                    -to finish writing the plan|" << endl
+		<< "  " << "|     cp [date/name]          -check plan in date        |" << endl
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     del [log/plan] [name]   -delete data               |" << endl
+		<< "  " << "|     delall [log/plan]       -delete data               |" << endl
+		<< "  " << "—————————————————————————————" << endl
+		<< "  " << "|     expd [name]             -export log data           |" << endl
+		<< "  " << "|     save                    -save data                 |" << endl
+		<< "  " << "|     save [log/plan]         -save data                 |" << endl
+		<< "  " << "|     exit                    -save and exit             |" << endl
+		<< "  " << "—————————————————————————————" << endl;
+	/*	<< "  " << "*           DO NOT use 'exit' before you really          *" << endl
+		<< "  " << "*               want to FINISH this program.             *" << endl
+		<< "  " << "—————————————————————————————" << endl;
+	*/
 }
 
 void headlist()
@@ -537,10 +580,41 @@ void headlist()
 	cout << "  " << "———————————————————————————" << endl
 		<< "  " << "|                     Time Writer                    |" << endl
 		<< "  " << "———————————————————————————" << endl
-		<< "  " << "|                    Version 1.3.1                   |" << endl
+		<< "  " << "|                    Version "<<ver<<"                   |" << endl
 		<< "  " << "———————————————————————————" << endl
 		<< "  " << "|   https://github.com//zhengyunhai/timewriter.git   |" << endl
 		<< "  " << "———————————————————————————" << endl;
+}
+
+void menu(struct wlp** namelink, struct wlp* node)
+{
+	struct wlp* head, * temp,*temp1;
+	head = node->next;
+	*namelink = (struct wlp*)malloc(sizeof(struct wlp));
+	initnode(namelink, 0);
+	temp =* namelink;//头节点不存信息
+	while (head != NULL)
+	{
+		if (!is_node(*namelink, head->name))
+		{
+			temp1 = (struct wlp*)malloc(sizeof(struct wlp));
+			initnode(&temp1, 0);
+			strcpy_s(temp1->name, sizeof(head->name), head->name);
+			temp1->b = head->b;		
+			strcpy_s(temp1->today, sizeof(head->today), head->today);
+			temp1->count = head->count;
+			strcpy_s(temp1->lpdata.info, sizeof(head->lpdata.info), head->lpdata.info);
+			temp->next = temp1;
+			temp = temp1;
+		}
+		head = head->next;
+	}
+
+}
+
+void copynode()
+{
+
 }
 
 int main(void)
@@ -555,12 +629,13 @@ int main(void)
 	//command list
 	{
 		headlist();
-	clist:outlist();
+	//clist:outlist();
 	}
 	struct wlp* wl = NULL;
 	struct wlp* lend;
 	struct wlp* pend;
 	struct wlp* wp = NULL;
+	
 	lend = wl;
 	pend = wp;
 	//读入文件默认存在
@@ -570,29 +645,16 @@ int main(void)
 	if (loadfile(path2, &wp) == 2)cout << "打开计划文件失败！已新建。" << endl;
 
 	char command[10] = { 0 };
-shuru:cout << "TimeWriter>> ";
+shuru:cout << endl<<"TimeWriter>> ";
 	  cin >> command;
 	  char command1[13] = { 0 };
 	  char command2[13] = { 0 };
 	  char command3[2] = { 0 };
+	  struct wlp* namelink = NULL;
 	  char tc[1] = {0};
 	  tc[0] = getchar();
 	  //指令匹配部分
 	  {
-		  if (!strcmp(command, "shc"))//show command list
-		  {
-			  if (tc[0] =='\n') goto clist;
-			  else 
-			  { 
-				  while (tc[0] != '\n')//吃掉多余的参数
-				  {
-					  tc[0] = getchar();
-				  }
-				  cout << "Wrong argument."<<endl; 
-				  goto  shuru;
-			  }
-		  }
-
 		  if (!strcmp(command, "list"))//列出项目名
 		  {
 			  struct wlp* temp=NULL;
@@ -618,6 +680,7 @@ shuru:cout << "TimeWriter>> ";
 				  {
 					  if (!strcmp(command1, "log"))//列出普通日志目录
 					  {
+						  menu(&namelink, wl);
 						  if (wl == NULL)cout << "No logs!" << endl;
 						  else {
 							  temp = wl;
@@ -627,8 +690,9 @@ shuru:cout << "TimeWriter>> ";
 								  cout << "No logs!" << endl;
 							  }
 							  else
-							  {
-								  cout << "  " << setw(20) << setiosflags(ios::left) << "LogName"; cout << "  " << setw(10) << "LogDate" << "  " << "SampleInfo" << endl;
+							  {							  
+								  temp = namelink->next;
+								  cout << "  " << setw(20) << setiosflags(ios::left) << "LogName"; cout << "  " << setw(10) << "LogDate" << "  " << "SampleInfo" << endl<<endl;
 								  while (temp != NULL)
 								  {
 									  if (temp->b == 0)
@@ -640,10 +704,12 @@ shuru:cout << "TimeWriter>> ";
 								  }
 							  }
 						  }
+						  freed(namelink);
 						  goto shuru;
 					  }
 					  if (!strcmp(command1, "prog"))//列出开发日志目录
 					  {
+						  menu(&namelink, wl);
 						  if (wl == NULL)cout << "No prog!" << endl;
 						  else {
 							  temp = wl;//prog与log存在同一链表中
@@ -654,7 +720,8 @@ shuru:cout << "TimeWriter>> ";
 							  }
 							  else
 							  {
-								  cout << "  " << setw(20) << setiosflags(ios::left) << "ProgName"; cout << "  " << setw(10) << "ProgDate" << "  " << "SampleInfo" << endl;
+								  temp = namelink->next;
+								  cout << "  " << setw(20) << setiosflags(ios::left) << "ProgName"; cout << "  " << setw(10) << "ProgDate" << "  " << "SampleInfo" << endl<<endl;
 								  while (temp != NULL)
 								  {
 									  if (temp->b)
@@ -666,10 +733,12 @@ shuru:cout << "TimeWriter>> ";
 								  }
 							  }
 						  }
+						  freed(namelink);
 						  goto shuru;
 					  }
 					  if (!strcmp(command1, "plan"))//列出计划目录
 					  {
+						  menu(&namelink, wp);
 							if (wp == NULL)cout << "No plans!" << endl;
 							else
 							{
@@ -681,7 +750,8 @@ shuru:cout << "TimeWriter>> ";
 								}
 								else
 								{
-									cout << "  " << setw(20) << setiosflags(ios::left) << "PlanName"; cout << "  " << setw(10) << "PlanDate" << "  " << "SampleInfo" << endl;
+									temp = namelink->next;
+									cout << "  " << setw(20) << setiosflags(ios::left) << "PlanName"; cout << "  " << setw(10) << "PlanDate" << "  " << "SampleInfo" << endl<<endl;
 									while (temp != NULL)
 									{
 										cout << "  " << setw(20) << setiosflags(ios::left) << temp->name; cout << " " << "[" << temp->today << "]" << "   ";
@@ -690,6 +760,7 @@ shuru:cout << "TimeWriter>> ";
 									}
 								}
 							}
+							freed(namelink);
 							goto shuru;
 					  }
 					
@@ -780,7 +851,7 @@ shuru:cout << "TimeWriter>> ";
 		  {
 			  if (tc[0] == '\n')
 			  {
-				  cout << td <<":"<< endl;
+				  //cout << td <<":"<< endl;
 				  searchdata(wl, td);
 				  goto shuru;
 			  }
@@ -799,7 +870,7 @@ shuru:cout << "TimeWriter>> ";
 				  }
 				  else
 				  {
-					  cout << command1 << ":" << endl;
+					  //cout << command1 << ":" << endl;
 					  searchdata(wl, command1);
 					  goto shuru;
 				  }
@@ -857,6 +928,10 @@ shuru:cout << "TimeWriter>> ";
 					  if (tc[0] != '\n')
 					  {
 						  cout << "Too many argument!" << endl;
+						  while (tc[0] != '\n')//吃掉多余的参数
+						  {
+							  tc[0] = getchar();
+						  }
 						  goto shuru;
 					  }
 					  else
@@ -883,6 +958,41 @@ shuru:cout << "TimeWriter>> ";
 				  }
 			  }
 		  }	
+
+		  if (!strcmp(command, "delall"))
+		  {
+			  if (tc[0] == '\n')
+			  {
+				  cout << "No argument!" << endl;
+				  goto shuru;
+			  }
+			  else
+			  {
+				  cin >> command1;
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  cout << "Too many argument!" << endl;
+					  while (tc[0] != '\n')//吃掉多余的参数
+					  {
+						  tc[0] = getchar();
+					  }
+					  goto shuru;
+				  }
+				  else
+				  {
+					  cout << "ALL "<<command1<<" WILL BE DELETED.COUNTINUE?(Y/N)";
+					  cin >> command2;
+					  if (!strcmp(command2, "y") || !strcmp(command2, "Y"))
+					  {
+						  if (!strcmp(command1, "log"))	{ delall(wl); cout << "ALL " << command1 << " have been DELETED."<<endl;  }
+						  else if (!strcmp(command1, "plan")) { delall(wp); cout << "ALL " << command1 << " have been DELETED." << endl;}
+						  else cout << "Wrong Argument!" << endl;
+					  }				  
+					  goto shuru;
+				  }
+			  }
+		  }
 
 		  if (!strcmp(command, "expd"))//暂时只用于导出开发日志
 		  {
@@ -912,18 +1022,68 @@ shuru:cout << "TimeWriter>> ";
 			  }
 		  }
 
+		  if (!strcmp(command, "save"))
+		  {
+			  if (tc[0] == '\n')
+			  {
+				  outtofile(path1, wl);
+				  outtofile(path2, wp);
+				  goto shuru;
+			  }
+			  else
+			  {
+				  cin >> command1;
+				  tc[0] = getchar();
+				  if (tc[0] != '\n')
+				  {
+					  while (tc[0] != '\n')//吃掉多余的参数
+					  {
+						  tc[0] = getchar();
+					  }
+					  cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+				  else
+				  {
+					  if (!strcmp(command1, "log")) { outtofile(path1, wl); }
+					  else if (!strcmp(command1, "plan")) { outtofile(path2, wp); }
+					  else cout << "Wrong argument!" << endl;
+					  goto shuru;
+				  }
+			  }
+		  }
+
+		  if (!strcmp(command, "-help"))
+		  {
+			  if (tc[0] == '\n')
+			  {
+				  outlist();
+				  goto shuru;
+			  }
+			  else
+			  {
+				  while (tc[0] != '\n')//吃掉多余的参数
+				  {
+					  tc[0] = getchar();
+				  }
+				  cout << "Wrong argument!" << endl;
+				  goto shuru;
+			  }
+		  }
+
 		  if (!strcmp(command, "exit")) //退出程序
 		  {
 			  if (tc[0] == '\n')
 			  {
-				  cout << "OUTNOW" << endl;
+				  cout << "LAYOUT" << endl;
 				  //保存
-				  outputfile(path1, wl);
+				  outtofile(path1, wl);
 				  freed(wl);//cout << "释放完毕" << endl;
-				  outputfile(path2, wp);
+				  outtofile(path2, wp);
 				  freed(wp);//cout << "释放完毕" << endl;
-				  free(tt);// cout << "释放完毕" << endl;
-				  free(td); cout << "释放完毕" << endl;
+				  free(tt); //cout << "释放完毕" << endl;
+				  free(td);
+				 // freed(namelink); cout << "释放完毕" << endl;
 				  Sleep(100);
 				  return 0;
 			  }
@@ -933,12 +1093,16 @@ shuru:cout << "TimeWriter>> ";
 				  {
 					  tc[0] = getchar();
 				  }
-				  cout << "Wrong argument!";
+				  cout << "Wrong argument!  Input '-help' for help. "<<endl;
 				  goto shuru;
 			  }
 		  }
 		  else {
 			  cout << "Can't find command '" << command <<" "<<command1<< "' in command list." << endl;
+			  while (tc[0] != '\n')//吃掉多余的参数
+			  {
+				  tc[0] = getchar();
+			  }
 			  goto shuru;
 		  }
 	  }

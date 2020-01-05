@@ -124,6 +124,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="linkversion.cpp" />
+    <ClCompile Include="logfunc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="logsoft.h">
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

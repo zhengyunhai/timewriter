@@ -9,7 +9,7 @@
 #include<windows.h>
 #include"logsoft.h"
 
-const char* ver = "1.4.0";
+const char* ver = "1.5.0";
 using namespace std;
 
 void f0(char* ti)//填充0
@@ -94,6 +94,17 @@ char* gettime()//获取当前时间
 	return r;
 }
 
+struct wlp* findtail(struct wlp* node)
+{
+	//struct wlp* end = NULL;
+	struct wlp* head = node;
+	while (head->next != NULL)
+	{
+		head = head->next;
+	}
+	return head;
+}
+
 void initnode(struct wlp** head, int i)//未完成，i=1时？
 {
 	struct wlp* r = *head;
@@ -105,6 +116,7 @@ void initnode(struct wlp** head, int i)//未完成，i=1时？
 		r->b = 0;
 		strcpy_s(r->lpdata.time, 13, "LOGTIME");
 		strcpy_s(r->lpdata.info, 13, "LOGINFO");
+		r->pre = NULL;
 		r->next = NULL;
 		r->lpdata.next = NULL;
 	}
@@ -145,6 +157,7 @@ int loadfile(char* path, struct wlp** wl)//假定文件存在
 			nn = NULL;
 			temp2 = (struct wlp*)malloc(sizeof(struct wlp));
 			if (temp2 == NULL) { cout << "Memory allocation failed." << endl; exit(1); }
+			initnode(&temp2, 0);
 			strcpy_s(temp2->name, strlen(temp1) + 1, temp1);
 			inf >> temp2->today;
 			inf >> temp2->b;
@@ -154,6 +167,7 @@ int loadfile(char* path, struct wlp** wl)//假定文件存在
 			temp2->lpdata.next = NULL;
 			temp2->next = NULL;
 			lend->next = temp2;
+			temp2->pre = lend;
 			lend = temp2;
 			tempend1 = &(temp2->lpdata);
 			while (i <= temp2->count)
@@ -221,6 +235,7 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 			printf("Memory allocation failed.\n");
 			exit(1);
 		}
+		initnode(&book, 0);
 		strcpy_s(book->name, 20, name);
 		strcpy_s(book->today, 13, td);
 		book->b = b;
@@ -252,6 +267,7 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 		{
 			book = (struct wlp*)malloc(sizeof(struct wlp));//分配空间 ，注意类型转换 
 			if (book == NULL) { printf("Memory allocation failed.\n"); exit(1); }
+			initnode(&book, 0);
 			strcpy_s(book->name, 20, name);
 			strcpy_s(book->today, 13, td);
 			book->b = b;
@@ -271,6 +287,7 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 				addinfo(book);
 				temp = head->next;
 				head->next = book;
+				book->pre = head;
 				book->next = temp;
 			}
 		}
@@ -286,6 +303,7 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 				printf("Memory allocation failed.\n");
 				exit(1);
 			}
+			initnode(&book, 0);
 			strcpy_s(book->name, 20, name);
 			strcpy_s(book->today, 13, td);
 			book->b = b;
@@ -305,7 +323,9 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 				addinfo(book);
 				temp = head->next;
 				head->next = book;
+				book->pre = head;
 				book->next = temp;
+				temp->pre = book;
 			}
 		}
 	}
@@ -315,13 +335,14 @@ void adddata(struct wlp** library, char* name, char* date, int b)//new version//
 void showinfo(struct wlp* node)
 {
 	struct data* end;
-	cout << node->today << endl;
+	cout <<" "<< node->today << endl<<endl;
 	end = &(node->lpdata);
 	while (end != NULL)
 	{
 		cout << " " << end->time << " " << end->info << endl;
 		end = end->next;
 	}
+	cout << endl;
 }
 
 void searchdata(struct wlp* wl, char* name)
@@ -333,6 +354,9 @@ void searchdata(struct wlp* wl, char* name)
 	else
 	{
 		cout << endl;
+		//while (temp->next != NULL){temp = temp->next;}
+		
+		temp = findtail(wl);
 		while (temp != NULL)
 		{
 			if (!strcmp(temp->name, name))
@@ -340,7 +364,7 @@ void searchdata(struct wlp* wl, char* name)
 				showinfo(temp);
 				count++;
 			}
-			temp = temp->next;
+			temp = temp->pre;
 		}
 		if (count == 0) cout << "There's no data for '" << name << "'" << endl;
 	}
@@ -480,7 +504,8 @@ void exportlog(struct wlp* node, char* name)
 		outf.open(path, ios::app);
 		struct wlp* temp;
 		struct data* end;
-		temp = node->next;
+		//temp = node->next;
+		temp = findtail(node);
 		while (temp != NULL)
 		{
 			if (!strcmp(temp->name, name))
@@ -493,7 +518,7 @@ void exportlog(struct wlp* node, char* name)
 					end = end->next;
 				}
 			}
-			temp = temp->next;
+			temp = temp->pre;
 		}
 		outf.close();
 		cout << "Data '" << name << "' has been exported in TXT.'" << endl;
@@ -508,9 +533,11 @@ void outlist()
 		<< "  " << "—————————————————————————————" << endl
 
 		<< "  " << "—————————————————————————————" << endl
-		<< "  " << "|     -help                     -show command list       |" << endl
+		<< "  " << "|     -help                   -show command list         |" << endl
 		<< "  " << "—————————————————————————————" << endl
 		<< "  " << "|     list [log/prog/plan]    -show logmenu              |" << endl
+		<< "  " << "|               -az           -order by last time        |" << endl
+		<< "  " << "|               -za           -order by created time     |" << endl
 		<< "  " << "—————————————————————————————" << endl
 		<< "  " << "|     log                     -to start writing a log    |" << endl
 		<< "  " << "|     prog [progname]         -to start writing a proglog|" << endl
@@ -546,30 +573,72 @@ void headlist()
 		<< "  " << "———————————————————————————" << endl;
 }
 
-void menu(struct wlp** namelink, struct wlp* node)
+void menu(struct wlp** namelink, struct wlp* node,int tag)
 {
 	struct wlp* head, * temp, * temp1;
 	head = node->next;
 	*namelink = (struct wlp*)malloc(sizeof(struct wlp));
 	initnode(namelink, 0);
 	temp = *namelink;//头节点不存信息
-	while (head != NULL)
+	if (1==tag)//从前到后，即按照更新的顺序从新到旧输出
 	{
-		if (!is_node(*namelink, head->name))
+		while (head != NULL)
 		{
-			temp1 = (struct wlp*)malloc(sizeof(struct wlp));
-			initnode(&temp1, 0);
-			strcpy_s(temp1->name, sizeof(head->name), head->name);
-			temp1->b = head->b;
-			strcpy_s(temp1->today, sizeof(head->today), head->today);
-			temp1->count = head->count;
-			strcpy_s(temp1->lpdata.info, sizeof(head->lpdata.info), head->lpdata.info);
-			temp->next = temp1;
-			temp = temp1;
+			if (!is_node(*namelink, head->name))
+			{
+				temp1 = (struct wlp*)malloc(sizeof(struct wlp));
+				initnode(&temp1, 0);
+				strcpy_s(temp1->name, sizeof(head->name), head->name);
+				temp1->b = head->b;
+				strcpy_s(temp1->today, sizeof(head->today), head->today);
+				temp1->count = head->count;
+				strcpy_s(temp1->lpdata.info, sizeof(head->lpdata.info), head->lpdata.info);
+				temp->next = temp1;
+				temp = temp1;
+			}
+			head = head->next;
 		}
-		head = head->next;
 	}
+	if (-1 == tag)//按照从旧到新输出
+	{
+		
+		head = findtail(node);
+		while (head != NULL)
+		{
+			if (!is_node(*namelink, head->name))
+			{
+				temp1 = (struct wlp*)malloc(sizeof(struct wlp));
+				initnode(&temp1, 0);
+				strcpy_s(temp1->name, sizeof(head->name), head->name);
+				temp1->b = head->b;
+				strcpy_s(temp1->today, sizeof(head->today), head->today);
+				temp1->count = head->count;
+				strcpy_s(temp1->lpdata.info, sizeof(head->lpdata.info), head->lpdata.info);
+				temp->next = temp1;
+				temp = temp1;
+			}
+			head = head->pre;
+		}
+	}
+}
 
+void printmenu(struct wlp* namelink,int tag)
+{
+	struct wlp* temp;
+
+			temp = namelink->next;
+			cout << "  " << setw(20) << setiosflags(ios::left) << "Name"; cout << "  " << setw(10) << "Date" << "  " << "SampleInfo" << endl << endl;
+			while (temp != NULL)
+			{
+				if (temp->b == tag)
+				{
+					cout << "  " << setw(20) << setiosflags(ios::left) << temp->name; cout << " " << "[" << temp->today << "]" << "   ";
+					sampleinfo(temp);
+				}
+				temp = temp->next;
+			}
+		
+	
 }
 
 void copynode()

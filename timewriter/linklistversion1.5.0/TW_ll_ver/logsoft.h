@@ -15,6 +15,7 @@ typedef struct wlp
 	int b;//b=0,普通日志,b=1,开发日志
 	int count;//计数该分支上节点个数，以确定该分支何时结束
 	struct data lpdata;
+	wlp* pre;
 	wlp* next;
 }wlp;
 
@@ -26,6 +27,9 @@ char* getday();
 
 char* gettime();
 //获取当前时间，返回格式例[19:01]
+
+struct wlp* findtail(struct wlp* node);
+//返回链表的尾节点地址
 
 void initnode(struct wlp** head, int i);
 //节点初始化
@@ -64,7 +68,7 @@ void sampleinfo(struct wlp* node);
 //打印简略信息
 
 void exportlog(struct wlp* node, char* name);
-//导出node链表中名为name的节点到同名txt中
+//导出node链表中名为name的节点到同名txt中,tag=1,正序，tag=-1,逆序
 
 void headlist();
 //打印软件名版本号等
@@ -75,8 +79,46 @@ int is_node(struct wlp* node, char* name);
 void delall(struct wlp* node);
 //删除全部节点
 
-void menu(struct wlp** namelink, struct wlp* node);
-//将node链表中节点按顺序保存首次出现的节点名到namelink中
+void menu(struct wlp** namelink, struct wlp* node,int tag);
+//将node链表中节点按顺序保存首次出现的节点名到namelink中,tag=1,正序，tag=-1,逆序
+
+void printmenu(struct wlp* namelink,int tag);
+//打印目录，tag=0,打印普通日志，tag=1，打印开发日志
 
 void copynode();
 //复制节点到目标位置，暂无
+
+//字符串匹配模板
+/*
+char command[10],command1[10],command2[10];
+char tc;
+cin>>command;
+tc=getchar();
+if (!strcmp(command, "字符串"))
+{
+	if ('\n' == tc)
+	{
+		cout << "WrongArgument" << endl;
+		goto shuru;
+	}
+	else
+	{
+		cin >> command1;
+		tc = getchar();
+		if ('\n' != tc)
+		{
+			while ('\n' != tc)tc = getchar();//吃掉多余参数
+		}
+		else
+		{
+			if (!strcmp(command1, "字符串1")
+			{
+				//操作
+			}
+			else cout<<"WrongArguments"<<endl;
+		}
+
+	}
+}
+*/
+

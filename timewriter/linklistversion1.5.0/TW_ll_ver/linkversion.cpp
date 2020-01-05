@@ -50,121 +50,164 @@ shuru:cout << endl<<"TimeWriter>> ";
 	  tc[0] = getchar();
 	  //指令匹配部分
 	  {
-		  if (!strcmp(command, "list"))//列出项目名
+		  if (!strcmp(command, "list"))//列出项目名,示例：list log -az
 		  {
 			  struct wlp* temp=NULL;
-			  if (tc[0] == '\n')
+			  if (tc[0] == '\n')//list
 			  {
 				  cout << "Need more arguments!" << endl;
 				  goto shuru;
 			  }
-			  else
+			  else//list log(plan)
 			  {
 				  cin >> command1;
-				  tc[0] = getchar();
-				  if (tc[0] != '\n')
-				  {
-					  while (tc[0] != '\n')//吃掉多余的参数
-					  {
-						  tc[0] = getchar();
-					  }
-					  cout << "Wrong argument!" << endl;
-					  goto shuru;
-				  }
-				  else
-				  {
+				  
 					  if (!strcmp(command1, "log"))//列出普通日志目录
 					  {
-						  menu(&namelink, wl);
-						  if (wl == NULL)cout << "No logs!" << endl;
-						  else {
-							  temp = wl;
-							  temp = temp->next;
-							  if (temp == NULL)
-							  {
-								  cout << "No logs!" << endl;
-							  }
+						  tc[0] = getchar();
+						  if (tc[0] == '\n')
+						  {
+							  menu(&namelink, wl, 1);	
+							  if (wl == NULL)cout << "No logs!" << endl;
 							  else
-							  {							  
-								  temp = namelink->next;
-								  cout << "  " << setw(20) << setiosflags(ios::left) << "LogName"; cout << "  " << setw(10) << "LogDate" << "  " << "SampleInfo" << endl<<endl;
-								  while (temp != NULL)
+							  {
+								  temp = wl;
+								  temp = temp->next;
+								  if (temp == NULL)cout << "No logs!" << endl;
+								  else printmenu(namelink,0);
+							  }
+						  }
+						  else
+						  {
+							  cin >> command2;
+							  if (!strcmp(command2, "-za"))
+							  {
+								  menu(&namelink, wl, 1);
+								  if (wl == NULL)cout << "No logs!" << endl;
+								  else
 								  {
-									  if (temp->b == 0)
-									  {
-										  cout << "  " << setw(20) << setiosflags(ios::left) << temp->name; cout << " " << "[" << temp->today << "]" << "   ";
-										  sampleinfo(temp);
-									  }
+									  temp = wl;
 									  temp = temp->next;
+									  if (temp == NULL)cout << "No logs!" << endl;
+									  else printmenu(namelink,0);
 								  }
 							  }
+							  else if (!strcmp(command2, "-az"))
+							  {
+								  menu(&namelink, wl, -1);
+								  if (wl == NULL)cout << "No logs!" << endl;
+								  else
+								  {
+									  temp = wl;
+									  temp = temp->next;
+									  if (temp == NULL)cout << "No logs!" << endl;
+									  else printmenu(namelink,0);
+								  }
+							  }
+							  else cout << "Wrong Arguments!" << endl;
 						  }
 						  freed(namelink);
 						  goto shuru;
 					  }
-					  if (!strcmp(command1, "prog"))//列出开发日志目录
+					  if (!strcmp(command1, "prog"))//列出普通日志目录
 					  {
-						  menu(&namelink, wl);
-						  if (wl == NULL)cout << "No prog!" << endl;
-						  else {
-							  temp = wl;//prog与log存在同一链表中
-							  temp = temp->next;
-							  if (temp == NULL)
-							  {
-								  cout << "No prog!" << endl;
-							  }
+						  tc[0] = getchar();
+						  if (tc[0] == '\n')
+						  {
+							  menu(&namelink, wl, 1);
+							  if (wl == NULL)cout << "No progs!" << endl;
 							  else
 							  {
-								  temp = namelink->next;
-								  cout << "  " << setw(20) << setiosflags(ios::left) << "ProgName"; cout << "  " << setw(10) << "ProgDate" << "  " << "SampleInfo" << endl<<endl;
-								  while (temp != NULL)
+								  temp = wl;
+								  temp = temp->next;
+								  if (temp == NULL)cout << "No progs!" << endl;
+								  else printmenu(namelink, 1);
+							  }
+						  }
+						  else
+						  {
+							  cin >> command2;
+							  if (!strcmp(command2, "-za"))
+							  {
+								  menu(&namelink, wl, 1);
+								  if (wl == NULL)cout << "No progs!" << endl;
+								  else
 								  {
-									  if (temp->b)
-									  {
-										  cout << "  " << setw(20) << setiosflags(ios::left) << temp->name; cout << " " << "[" << temp->today << "]" << "   ";
-										  sampleinfo(temp);
-									  }
+									  temp = wl;
 									  temp = temp->next;
+									  if (temp == NULL)cout << "No progs!" << endl;
+									  else printmenu(namelink,1);
 								  }
 							  }
+							  else if (!strcmp(command2, "-az"))
+							  {
+								  menu(&namelink, wl, -1);
+								  if (wl == NULL)cout << "No progs!" << endl;
+								  else
+								  {
+									  temp = wl;
+									  temp = temp->next;
+									  if (temp == NULL)cout << "No progs!" << endl;
+									  else printmenu(namelink, 1);
+								  }
+							  }
+							  else cout << "Wrong Arguments!" << endl;
 						  }
 						  freed(namelink);
 						  goto shuru;
 					  }
-					  if (!strcmp(command1, "plan"))//列出计划目录
+					  if (!strcmp(command1, "plan"))//列出普通日志目录
 					  {
-						  menu(&namelink, wp);
-							if (wp == NULL)cout << "No plans!" << endl;
-							else
-							{
-								temp = wp;
-								temp = temp->next;
-								if (temp == NULL)
-								{
-									cout << "No plans!" << endl;
-								}
-								else
-								{
-									temp = namelink->next;
-									cout << "  " << setw(20) << setiosflags(ios::left) << "PlanName"; cout << "  " << setw(10) << "PlanDate" << "  " << "SampleInfo" << endl<<endl;
-									while (temp != NULL)
-									{
-										cout << "  " << setw(20) << setiosflags(ios::left) << temp->name; cout << " " << "[" << temp->today << "]" << "   ";
-										sampleinfo(temp);
-										temp = temp->next;
-									}
-								}
-							}
-							freed(namelink);
-							goto shuru;
+						  tc[0] = getchar();
+						  if (tc[0] == '\n')
+						  {
+							  menu(&namelink, wp, 1);
+							  if (wp == NULL)cout << "No plan!" << endl;
+							  else
+							  {
+								  temp = wp;
+								  temp = temp->next;
+								  if (temp == NULL)cout << "No plan!" << endl;
+								  else printmenu(namelink, 0);
+							  }
+						  }
+						  else
+						  {
+							  cin >> command2;
+							  if (!strcmp(command2, "-za"))
+							  {
+								  menu(&namelink, wp, 1);
+								  if (wp == NULL)cout << "No plan!" << endl;
+								  else
+								  {
+									  temp = wp;
+									  temp = temp->next;
+									  if (temp == NULL)cout << "No plan!" << endl;
+									  else printmenu(namelink, 0);
+								  }
+							  }
+							  else if (!strcmp(command2, "-az"))
+							  {
+								  menu(&namelink, wp, -1);
+								  if (wp == NULL)cout << "No plan!" << endl;
+								  else
+								  {
+									  temp = wp;
+									  temp = temp->next;
+									  if (temp == NULL)cout << "No plan!" << endl;
+									  else printmenu(namelink, 0);
+								  }
+							  }
+							  else cout << "Wrong Arguments!" << endl;
+						  }
+						  freed(namelink);
+						  goto shuru;
 					  }
 					
 					  else {
 						  cout << "Wrong argument!" << endl;
 						  goto shuru;
-					  }
-					  	  
-				  }
+					  }			  
 			  }
 		  }
 
